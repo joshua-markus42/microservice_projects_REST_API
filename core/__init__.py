@@ -12,9 +12,10 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     api.init_app(app)
-    db.init_app(app)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://arthur:arthur234@localhost/projects'
     app.register_blueprint(api_blueprint)
+    with app.app_context():
+        db.init_app(app)
 
     return app
