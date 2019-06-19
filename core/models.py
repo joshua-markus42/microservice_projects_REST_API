@@ -1,17 +1,18 @@
-from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
+from uuid import uuid4
+from sqlalchemy import text
 
 from . import db
 
 
 class Projects(db.Model):
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    status = db.Column(db.String(20))
+    id = db.Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    status = db.Column(db.String())
     rooms_data = db.relationship('RoomsData')
 
 
 class RoomsData(db.Model):
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     project_id = db.Column(UUID(as_uuid=True), db.ForeignKey('projects.id'))
     address = db.Column(db.String(80))
     city = db.Column(db.String(80))
