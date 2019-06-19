@@ -3,7 +3,6 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 
 from .api import api_blueprint, api
-from config import DATABASE_URI
 
 moment = Moment()
 db = SQLAlchemy()
