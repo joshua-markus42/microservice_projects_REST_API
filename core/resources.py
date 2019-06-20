@@ -1,17 +1,18 @@
-from flask import jsonify
+from flask import jsonify, request
 from flask_restful import Resource
+import uuid
 
+from .models import Projects
 from . import db
 
 
 class ProjectsCollector(Resource):
+
     def put(self, id):
-        return jsonify(id)
-# class ProjectsCollector(Resource):
-#     pass
-# #     def put(self, id):
-# #         status = request.json["status"]
-# #         projects = Projects.query().filter_by(id=id).first()
-# #         projects.status = status
-# #         db.session.commit()
-# #         return jsonify('Ok')
+        new_status = request.json["status"]
+
+        project = Projects.query.filter_by(id=uuid.UUID(id)).first()
+        project.status = new_status
+        db.session.commit()
+        return jsonify(dict(id=project.id, status=project.status))
+
