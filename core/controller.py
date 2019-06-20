@@ -3,7 +3,6 @@ from flask_restful import Resource
 import datetime
 import uuid
 
-
 from .models import Projects, RoomsData
 from . import db
 
@@ -27,3 +26,9 @@ class ProjectsCollector(Resource):
             db.session.add(data_about_room)
         db.session.commit()
         return jsonify(dict(status='write_all'))
+
+    def delete(self, id):
+        db.session.query(RoomsData).filter(RoomsData.project_id == uuid.UUID(id)).delete()
+        # print(a)
+        db.session.commit()
+        return jsonify('delete')
