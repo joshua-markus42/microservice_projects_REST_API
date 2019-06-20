@@ -1,12 +1,9 @@
 from flask import Flask
-from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 from .api import api_blueprint, api
-
-moment = Moment()
 
 
 def create_app():
