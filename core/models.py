@@ -10,6 +10,10 @@ class Projects(db.Model):
     status = db.Column(db.String())
     rooms_data = db.relationship('Data')
 
+    def __init__(self, name, status):
+        self.name = name
+        self.status = status
+
 
 class Data(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
