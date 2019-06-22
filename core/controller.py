@@ -7,60 +7,8 @@ from .models import Projects, Data
 from . import db
 
 
-class ProjectCRUD(Resource):
-    """
-    Manipulate with particular project
-    """
-
-    def get(self):
-        """
-        Method to get all project data by id
-        """
-        project_id = request.json['id']
-        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
-        return jsonify(dict(name=project.name, status=project.name))
-
-    def post(self):
-        """
-        Method to add a new project into the database
-        """
-        new_project_name = request.json['id']
-        new_project = Projects(str(new_project_name), 'waiting_for_data')
-        db.session.add(new_project)
-        db.session.commit()
-        return jsonify('Successfully added')
-
-    def delete(self):
-        """
-        Method to delete a project
-        """
-        project_id = request.json['id']
-        db.session.query(Projects).filter(Projects.id == uuid.UUID(project_id)).delete()
-        db.session.commit()
-        return jsonify('Successfully deleted')
-
-    def put(self):
-        """
-        Method to change the name of a project
-        """
-        project_id = request.json['id']
-        project_name = request.json['name']
-        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
-        project.name = project_name
-        db.session.commit()
-        return jsonify('Successfully updated')
-
-
 class ProjectsDataHandler(Resource):
-    """
-    Manipulate the project data
-    """
-
     def put(self, id):
-        """
-        Method to update project status when uploading data
-        :param id: an id of the project
-        """
         new_status = request.json["status"]
         project = Projects.query.filter_by(id=uuid.UUID(id)).first()
         project.status = new_status
@@ -68,10 +16,6 @@ class ProjectsDataHandler(Resource):
         return jsonify(dict(id=project.id, status=project.status))
 
     def post(self, id):
-        """
-        Method to write data in database
-        :param id: an id of the project
-        """
         for data in request.json:
             data_about_room = Data(
                 uuid.UUID(id), data['address'], data['city'], data['square'],
@@ -83,17 +27,34 @@ class ProjectsDataHandler(Resource):
         return jsonify(dict(status='write_all'))
 
     def delete(self, id):
-        """
-        Method to delete all data of the particular project
-        :param id: an id of the project
-        """
         db.session.query(Data).filter(Data.project_id == uuid.UUID(id)).delete()
         db.session.commit()
         return jsonify(dict(status='delete'))
 
-    def get(self, id):
-        """
-        Method to get all data of the particular project
-        :param id: an id of the project
-        """
-        pass
+
+class ProjectCRUD(Resource):
+    def get(self):
+        project_id = request.json['id']
+        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
+        return jsonify(dict(name=project.name, status=project.name))
+
+    def post(self):
+        new_project_name = request.json['id']
+        new_project = Projects(str(new_project_name), 'waiting_for_data')
+        db.session.add(new_project)
+        db.session.commit()
+        return jsonify('Successfully added')
+
+    def delete(self):
+        project_id = request.json['id']
+        db.session.query(Projects).filter(Projects.id == uuid.UUID(project_id)).delete()
+        db.session.commit()
+        return jsonify('Successfully deleted')
+
+    def put(self):
+        project_id = request.json['id']
+        project_name = request.json['name']
+        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
+        project.name = project_name
+        db.session.commit()
+        return jsonify('Successfully updated')

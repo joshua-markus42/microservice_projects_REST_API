@@ -11,7 +11,7 @@ def create_app():
     api.init_app(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://arthur:arthur234@localhost/projects'
-    app.register_blueprint(api_blueprint, url_prefix='/projects')
+    app.register_blueprint(api_blueprint)
 
     with app.app_context():
         db.init_app(app)
