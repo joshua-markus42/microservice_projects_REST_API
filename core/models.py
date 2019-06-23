@@ -7,6 +7,7 @@ from . import db
 class Projects(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     name = db.Column(db.String())
+    contract_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False)
     status = db.Column(db.String())
     rooms_data = db.relationship('Data')
 

@@ -3,13 +3,14 @@ from flask_restful import Resource
 import datetime
 import uuid
 
+from .utils.parsers import status_parser
 from .models import Projects, Data
 from . import db
 
 
 class ProjectsDataHandler(Resource):
     def put(self, id):
-        new_status = request.json["status"]
+        new_status = status_parser()["status"]
         project = Projects.query.filter_by(id=uuid.UUID(id)).first()
         project.status = new_status
         db.session.commit()
@@ -39,7 +40,7 @@ class ProjectCRUD(Resource):
         return jsonify(dict(name=project.name, status=project.name))
 
     def post(self):
-        new_project_name = request.json['id']
+        new_project_name = request.json['name']
         new_project = Projects(str(new_project_name), 'waiting_for_data')
         db.session.add(new_project)
         db.session.commit()
