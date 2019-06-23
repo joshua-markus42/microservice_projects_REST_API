@@ -10,11 +10,13 @@ from . import db
 
 class ProjectsDataHandler(Resource):
     def put(self, id):
-        new_status = status_parser()["status"]
+        data = status_parser()
+        new_status = data['status']
+        print(new_status)
         project = Projects.query.filter_by(id=uuid.UUID(id)).first()
         project.status = new_status
         db.session.commit()
-        return jsonify(dict(id=project.id, status=project.status))
+        return 'ok', 200
 
     def post(self, id):
         for data in request.json:
