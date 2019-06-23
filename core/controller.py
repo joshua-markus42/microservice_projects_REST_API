@@ -1,10 +1,18 @@
-from flask import jsonify, request
-from flask_restful import Resource
-import datetime
+import logging as login
 import uuid
 
-from .models import Projects, Data
+from flask import jsonify, request
+from flask_restful import Resource
+
 from . import db
+from .models import Projects, Data, project_schema, data_schema
+
+
+class Home(Resource):
+
+    def get(self):
+        login.debug("Get method")
+        return {"msg": "GET method. Main!!!"}, 200
 
 
 class ProjectCRUD(Resource):
@@ -16,19 +24,21 @@ class ProjectCRUD(Resource):
         """
         Method to get all project data by id
         """
-        project_id = request.json['id']
-        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
-        return jsonify(dict(name=project.name, status=project.name))
+        login.debug("Get method")
+        # project_id = request.json['id']
+        # project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
+        # return jsonify(dict(name=project.name, status=project.name))
+        return {"msg": "GET method of projects"}, 200
 
     def post(self):
         """
         Method to add a new project into the database
         """
-        new_project_name = request.json['id']
-        new_project = Projects(str(new_project_name), 'waiting_for_data')
-        db.session.add(new_project)
-        db.session.commit()
-        return jsonify('Successfully added')
+        # new_project_name = request.json['id']
+        # new_project = Projects(str(new_project_name), 'waiting_for_data')
+        # db.session.add(new_project)
+        # db.session.commit()
+        # return jsonify('Successfully added')
 
     def delete(self):
         """
@@ -97,3 +107,48 @@ class ProjectsDataHandler(Resource):
         :param id: an id of the project
         """
         pass
+
+
+class ProjectsCalc(Resource):
+
+    # def get(self, id):
+
+    # """
+    #         Method to fetch data of the particular project for calculation
+    #         :param id: an id of the project
+    #         """
+    #         project = Projects.query.get(id)
+    #         output = project_schema.dump(project).data
+    #         return project_schema.jsonify({'project': output})
+
+    def post(self, id):
+        """
+        Method to post data of the particular project for calculation
+        :param id: an id of the project
+        """
+        # entry_data = request.get_json()
+        # _id = entry_data['id']
+        _project = Projects.query.filter_by(id=uuid.UUID(id)).first_or_404()
+        _data = Data.query.filter_by(id=uuid.UUID(_project.id)).first_or_404()
+        _project.status = "calculation"
+        db.session.commit()
+        output_prj = project_schema.dump(_project).data
+        output_data = data_schema.dump(_data).data
+        return project_schema.jsonify({'project': output_prj, 'data': output_data})
+
+    def put(self, id):
+        """
+        Method to update project status data are in calculation progress
+        :param id: an id of the project
+        """
+        # entry_data = request.get_json()
+        # _id = entry_data['id']
+        project = Projects.query.filter_by(id=uuid.UUID(id)).first()
+        if not project:
+            return jsonify({"msg": "Can't update - no such project"})
+        new_status = request.json["status"]
+        project.status = new_status
+        db.session.commit()
+        return {"msg": "Put method of projects"}, 200
+        # result = project_schema.dump(project)
+        # return project_schema.jsonify(result)
