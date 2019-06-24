@@ -1,18 +1,24 @@
 import logging as login
 import uuid
 
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 from flask_restful import Resource
 
 from . import db
-from .models import Projects, Data, project_schema, data_schema
+from core.models import Projects, Data, project_schema, data_schema
 
 
-class Home(Resource):
-
-    def get(self):
-        login.debug("Get method")
-        return {"msg": "GET method. Main!!!"}, 200
+# class Home(Resource):
+#
+#     def get(self):
+#         login.debug("Get method")
+#         return render_template('main.html')
+#         # return {"msg": "GET method. "}, 200
+#
+#     def post(self):
+#         login.debug("Get method")
+#         # return render_template('login.html', error=error)
+#         return {"msg": "POST method. "}, 200
 
 
 class ProjectCRUD(Resource):
@@ -141,6 +147,7 @@ class ProjectsCalc(Resource):
         Method to update project status data are in calculation progress
         :param id: an id of the project
         """
+        login.debug("PUT method")
         # entry_data = request.get_json()
         # _id = entry_data['id']
         project = Projects.query.filter_by(id=uuid.UUID(id)).first()

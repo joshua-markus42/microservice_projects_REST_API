@@ -1,6 +1,6 @@
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import UUID
-from . import db, ma
+from core import db, ma
 
 
 class Projects(db.Model):
