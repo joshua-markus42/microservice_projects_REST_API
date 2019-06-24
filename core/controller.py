@@ -3,7 +3,7 @@ from flask_restful import Resource
 import datetime
 import uuid
 
-from .utils.parsers import status_parser
+from .utils.parsers import status_parser, data_parser
 from .models import Projects, Data
 from . import db
 
@@ -19,7 +19,9 @@ class ProjectsDataHandler(Resource):
         return 'ok', 200
 
     def post(self, id):
-        for data in request.json:
+
+        for data in request.get_json().get('data'):
+            print(data)
             data_about_room = Data(
                 uuid.UUID(id), data['address'], data['city'], data['square'],
                 data['living_square'], data['price']['currency_value'], data['price']['currency'],

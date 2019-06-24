@@ -11,8 +11,9 @@ class Projects(db.Model):
     status = db.Column(db.String())
     rooms_data = db.relationship('Data')
 
-    def __init__(self, name, status):
+    def __init__(self, name, contract_id, status):
         self.name = name
+        self.contract_id = contract_id
         self.status = status
 
 
