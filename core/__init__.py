@@ -12,7 +12,7 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://arthur:arthur234@localhost/projects'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.register_blueprint(api_blueprint)
+    app.register_blueprint(api_blueprint, url_prefix='/api')
 
     with app.app_context():
         db.init_app(app)
