@@ -8,7 +8,34 @@ from .models import Projects, Data
 from . import db
 
 
-class ProjectsDataHandler(Resource):
+# /api/projects
+class ProjectsInitializer(Resource):
+    def post(self):
+        project_name = request.json['name']
+        contract_id = request.json['contract_id']
+        new_project = Projects(name=project_name, contract_id=uuid.UUID(contract_id), status='waiting_for_data')
+        db.session.add(new_project)
+        db.session.commit()
+        return jsonify({'status': 'ok'})
+
+
+# /api/projects/<id>
+class ProjectsResources(Resource):
+    def get(self, id):
+        project = Projects.query.filter_by(id=uuid.UUID(id)).first()
+        return jsonify(dict(id=id, name=project.name, contract_id=project.contract_id, status=project.name))
+
+    # update contract_id
+    def put(self, id):
+        project_name = request.json['contract_id']
+        project = Projects.query.filter_by(id=uuid.UUID(id)).first()
+        project.name = project_name
+        db.session.commit()
+        return jsonify({'status': 'updated'})
+
+
+# /api/projects/status/<id>
+class ProjectStatusUpdated(Resource):
     def put(self, id):
         data = status_parser()
         new_status = data['status']
@@ -18,9 +45,11 @@ class ProjectsDataHandler(Resource):
         db.session.commit()
         return 'ok', 200
 
-    def post(self, id):
 
-        for data in request.get_json().get('data'):
+# /api/projects/data/<id>
+class ProjectsDataHandler(Resource):
+    def post(self, id):
+        for data in request.json().get('data'):
             print(data)
             data_about_room = Data(
                 uuid.UUID(id), data['address'], data['city'], data['square'],
@@ -30,36 +59,3 @@ class ProjectsDataHandler(Resource):
             db.session.add(data_about_room)
         db.session.commit()
         return jsonify(dict(status='write_all'))
-
-    def delete(self, id):
-        db.session.query(Data).filter(Data.project_id == uuid.UUID(id)).delete()
-        db.session.commit()
-        return jsonify(dict(status='delete'))
-
-
-class ProjectCRUD(Resource):
-    def get(self):
-        project_id = request.json['id']
-        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
-        return jsonify(dict(name=project.name, status=project.name))
-
-    def post(self):
-        new_project_name = request.json['name']
-        new_project = Projects(str(new_project_name), 'waiting_for_data')
-        db.session.add(new_project)
-        db.session.commit()
-        return jsonify('Successfully added')
-
-    def delete(self):
-        project_id = request.json['id']
-        db.session.query(Projects).filter(Projects.id == uuid.UUID(project_id)).delete()
-        db.session.commit()
-        return jsonify('Successfully deleted')
-
-    def put(self):
-        project_id = request.json['id']
-        project_name = request.json['name']
-        project = Projects.query.filter_by(id=uuid.UUID(project_id)).first()
-        project.name = project_name
-        db.session.commit()
-        return jsonify('Successfully updated')
