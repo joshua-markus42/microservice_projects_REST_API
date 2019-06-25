@@ -1,20 +1,16 @@
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import text
+from uuid import uuid4
 
 from . import db
 
 
 class Projects(db.Model):
-    id = db.Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = db.Column(db.String())
     contract_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False)
     status = db.Column(db.String())
     rooms_data = db.relationship('Data')
-
-    def __init__(self, name, contract_id, status):
-        self.name = name
-        self.contract_id = contract_id
-        self.status = status
 
 
 class Data(db.Model):
@@ -29,16 +25,3 @@ class Data(db.Model):
     published_date = db.Column(db.DateTime())
     rooms = db.Column(db.Integer())
     toilets = db.Column(db.Integer())
-
-    def __init__(self, project_id, address, city, square, living_square,
-                 currency_value, currency, published_date, rooms, toilets):
-        self.project_id = project_id
-        self.address = address
-        self.city = city
-        self.square = square
-        self.living_square = living_square
-        self.currency_value = currency_value
-        self.currency = currency
-        self.published_date = published_date
-        self.rooms = rooms
-        self.toilets = toilets
