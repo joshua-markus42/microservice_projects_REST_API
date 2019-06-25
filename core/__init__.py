@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-from .api import api_blueprint, api
+from core.api import api_blueprint, api
 
 
 def create_app():
