@@ -1,12 +1,18 @@
 from flask import Blueprint
 from flask_restful import Api
 
-from .controller import ProjectCRUD, ProjectsDataHandler, ProjectsCalc
+from core.controller import DataHandler, ProjectsInitializer, ProjectsResources, StatusUpdater
+from core.controller import ProjectsCalcData, ProjectsCalcStatus
+
 
 api_blueprint = Blueprint('api', __name__)
 api = Api(api_blueprint)
 
-# api.add_resource(Home, '/')
-api.add_resource(ProjectCRUD, '/projects')
-api.add_resource(ProjectsDataHandler, '/projects/data/<id>')
-api.add_resource(ProjectsCalc, '/calc')
+api.add_resource(ProjectsInitializer, '/projects')
+api.add_resource(ProjectsResources, '/projects/<id>')
+
+api.add_resource(DataHandler, '/projects/data/<id>')
+api.add_resource(StatusUpdater, '/projects/status/<id>')
+
+api.add_resource(ProjectsCalcData, '/calc/data/<id>')
+api.add_resource(ProjectsCalcStatus, '/calc/status/<id>')
