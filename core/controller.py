@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from flask_restful import Resource
 import uuid
-import logging as login
+import logging as log
 
 from core.utils.schemas import ProjectSchema, DataSchema
 from core.models import Projects, Data
@@ -75,7 +75,7 @@ class ProjectsCalcData(Resource):
         Method to fetch data of the particular project for calculation
         :param id: an id of the project
         """
-        login.debug("GET method")
+        log.debug("GET method")
         # project = Projects.query.get(id)
         # output = project_schema.dump(project).data
         # return project_schema.jsonify({'project': output})
@@ -94,7 +94,7 @@ class ProjectsCalcData(Resource):
         Method to retrieve  calculated data of the particular project
         :param id: an id of the project
         """
-        login.debug("POST method")
+        log.debug("POST method")
 
         # deserialize input json
         # entry_data = request.get_json() ???
@@ -115,7 +115,7 @@ class ProjectsCalcStatus(Resource):
         Method to update project status data which are in calculation progress
         :param id: an id of the project
         """
-        login.debug("PUT method")
+        log.debug("PUT method")
         # json_data = request.get_json()
 
         # deserialize input json

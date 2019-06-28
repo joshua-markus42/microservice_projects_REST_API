@@ -25,11 +25,11 @@
  <div class="jumbotron text-center">
   <h1>Python D-165</h1>
   <p>We specialize in blablabla</p>
-  <form class="form-inline">
+  <form action="" method="post" enctype="multipart/form-data" class="form-inline">
     <div class="input-group">
       <input type="email" class="form-control" size="50" placeholder="Введите данные для подсчета" required>
       <div class="input-group-btn">
-        <a href="{{ url_for('api.projectsinitializer') }}" class="btn btn-primary">Загрузить данные</a>
+        <a href="{{ url_for('main.home') }}" class="btn btn-primary">Загрузить данные</a>
       </div>
     </div>
   </form>

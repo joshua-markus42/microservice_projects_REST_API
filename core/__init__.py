@@ -1,15 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from flask_marshmallow import Marshmallow
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 db = SQLAlchemy()
-# ma = Marshmallow()
 
 from core.api import api_blueprint, api
-from core.view import main
+from main.view import main
 
 
 def create_app():
@@ -22,6 +20,5 @@ def create_app():
 
     with app.app_context():
         db.init_app(app)
-        # ma.init_app(app)
 
     return app
