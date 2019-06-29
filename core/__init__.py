@@ -1,6 +1,8 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import os
+from flask import Flask
+# from flask.ext.session import Session
+from flask_sqlalchemy import SQLAlchemy
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -12,7 +14,7 @@ from main.view import main
 
 def create_app():
     app = Flask(__name__, template_folder=os.path.join(BASE_DIR, 'templates'))
-    api.init_app(app)
+    # sess = Session()
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://e:password@localhost/flask_api'
     app.register_blueprint(api_blueprint, url_prefix='/api')
@@ -20,5 +22,5 @@ def create_app():
 
     with app.app_context():
         db.init_app(app)
-
+        # sess.init_app(app)
     return app

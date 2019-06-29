@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, abort, redirect, url_for, render_template
 from flask_restful import Resource
 import uuid
 import logging as log
@@ -53,9 +53,10 @@ class StatusUpdater(Resource):
 
 # /api/projects/data/<id>
 class DataHandler(Resource):
+
     def post(self, id):
+        log.debug("POST method")
         for data in request.json().get('data'):
-            print(data)
             data_about_room = Data(
                 uuid.UUID(id), data['address'], data['city'], data['square'],
                 data['living_square'], data['price']['currency_value'], data['price']['currency'],
@@ -63,10 +64,11 @@ class DataHandler(Resource):
             )
             db.session.add(data_about_room)
         db.session.commit()
-        return jsonify(dict(status='write_all'))
+        return {"msg": "OK"}, 200
+        # return jsonify(dict(status='write_all'))
 
 
-# /api/calc/data/<id>
+# /projects/calc/<id>
 class ProjectsCalcData(Resource):
 
     def get(self, id):
@@ -76,18 +78,21 @@ class ProjectsCalcData(Resource):
         :param id: an id of the project
         """
         log.debug("GET method")
-        # project = Projects.query.get(id)
-        # output = project_schema.dump(project).data
-        # return project_schema.jsonify({'project': output})
-        # entry_data = request.get_json()
+        _project = Projects.query.filter_by(id=uuid.UUID(id)).first()
+        if not _project:
+            # abort(404)
+            return {"message": "There is no such project"}, 404
 
-        _project = Projects.query.filter_by(id=uuid.UUID(id)).first_or_404()
-        _data = Data.query.filter_by(id=uuid.UUID(_project.id)).first_or_404()
+        _id = str(_project.id)
+        _data = Data.query.filter_by(id=uuid.UUID(_id))
+        if not _data:
+            abort(400)
+            return {"message": "No input data provided"}, 400
         _project.status = "calculation"
         db.session.commit()
         output_prj = project_schema.dump(_project).data
         output_data = data_schema.dump(_data).data
-        return project_schema.jsonify({"project": output_prj, "data": output_data})
+        return jsonify({"project": output_prj, "data": output_data})
 
     def post(self, id):
         """
@@ -97,15 +102,22 @@ class ProjectsCalcData(Resource):
         log.debug("POST method")
 
         # deserialize input json
-        # entry_data = request.get_json() ???
-        json_data = project_schema.load(request.json)[0]
-        if not json_data:
-            return jsonify({"message": "No input data provided"}), 400
-        _project = Projects.query.filter_by(id=uuid.UUID(id)).first_or_404()
-        if not _project:
-            return jsonify({"msg": "There are no such project"})
-        result = json_data['result']
-        return {"msg": "Result printed"}, 200
+        entry_data = request.get_json()
+        if not entry_data:
+            return {"message": "No input data provided"}, 400
+        result = entry_data["result"]
+        return {"result": result}, 200
+        # # _project = Projects.query.filter_by(id=uuid.UUID(id)).first()
+        # # if not _project:
+        # #     return abort(jsonify(message="There is no such project"), 404)
+        #     # return jsonify({"msg": "There are no such project"})
+        # result = entry_data["result"]
+        # if not result:
+        #     return abort(jsonify(message="No input data provided"), 400)
+        # return render_template('main.html', result=result)
+        # return redirect(url_for('/', result=result))
+            # {"msg": "Result printed"}, 200
+
 
 
 # /api/calc/status/<id>
@@ -121,12 +133,16 @@ class ProjectsCalcStatus(Resource):
         # deserialize input json
         json_data = project_schema.load(request.json)[0]
         if not json_data:
-            return jsonify({"message": "No input data provided"}), 400
-        new_status = json_data['status']
-        print(new_status)
+            return abort(jsonify(message="No input data provided"), 400)
+
+            # return jsonify({"message": "No input data provided"}), 400
+        new_status = json_data["status"]
+
+        log.debug(new_status)
         project = Projects.query.filter_by(id=uuid.UUID(id)).first()
         if not project:
-            return jsonify({"msg": "Can't update - no such project"})
+            return abort(jsonify(message="There is no such project"), 404)
+            # return jsonify({"msg": "Can't update - no such project"})
         project.status = new_status
         db.session.commit()
         return {"msg": "Status succefully updated"}, 200

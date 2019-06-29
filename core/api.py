@@ -14,5 +14,5 @@ api.add_resource(ProjectsResources, '/projects/<id>')
 api.add_resource(DataHandler, '/projects/data/<id>')
 api.add_resource(StatusUpdater, '/projects/status/<id>')
 
-api.add_resource(ProjectsCalcData, '/calc/data/<id>')
-api.add_resource(ProjectsCalcStatus, '/calc/status/<id>')
+api.add_resource(ProjectsCalcData, '/projects/calc/<id>')
+# api.add_resource(ProjectsCalcStatus, '/calc/status/<id>')

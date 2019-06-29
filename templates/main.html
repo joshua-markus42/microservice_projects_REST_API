@@ -15,8 +15,14 @@
   background-color: rgba(44, 121, 120, 0.66);
   color: #ffffff;
 }
+#submit {
+    margin: 2vh;
+}
 #calc {
-    padding: 10vh
+    padding: 5vh
+}
+#calc .btn {
+    border-radius: 5px;
 }
 </style>
 
@@ -25,20 +31,17 @@
  <div class="jumbotron text-center">
   <h1>Python D-165</h1>
   <p>We specialize in blablabla</p>
-  <form action="" method="post" enctype="multipart/form-data" class="form-inline">
+  <form action="/" method="post" enctype="multipart/form-data" class="form-inline">
     <div class="input-group">
-      <input type="email" class="form-control" size="50" placeholder="Введите данные для подсчета" required>
-      <div class="input-group-btn">
-        <a href="{{ url_for('main.home') }}" class="btn btn-primary">Загрузить данные</a>
-      </div>
+        <input type="file" name="fileToUpload" id="fileToUpload">
+        <input id="submit" type="submit" value="Загрузить данные" class="btn btn-primary">
     </div>
   </form>
 
      <div id="calc" class="input-group-btn">
-        <a href="{{ url_for('api.projectsinitializer') }}" class="btn btn-warning">Расчет</a>
+        <a href="{{ url_for('api.projectsinitializer') }}" class="btn btn-warning btn-lg">Расчет</a>
       </div>
 </div>
-
 
 </body>
 </html>
