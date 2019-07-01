@@ -11,11 +11,47 @@ project_schema = ProjectSchema()
 data_schema = DataSchema()
 
 
+def get_paginated_list(klass, url, start, limit):
+    # check if page exists
+    results = klass.query.all()
+    count = len(results)
+    if (count < start):
+        abort(404)
+    # make response
+    obj = {}
+    obj['start'] = start
+    obj['limit'] = limit
+    obj['count'] = count
+    # make URLs
+    # make previous url
+    if start == 1:
+        obj['previous'] = ''
+    else:
+        start_copy = max(1, start - limit)
+        limit_copy = start - 1
+        obj['previous'] = url + '?start=%d&limit=%d' % (start_copy, limit_copy)
+    # make next url
+    if start + limit > count:
+        obj['next'] = ''
+    else:
+        start_copy = start + limit
+        obj['next'] = url + '?start=%d&limit=%d' % (start_copy, limit)
+    # finally extract result according to bounds
+    obj['results'] = results[(start - 1):(start - 1 + limit)]
+    return obj
+
+
 # /api/projects
 class ProjectsInitializer(Resource):
     def get(self):
-        projects = Projects.query.all()
-        return jsonify({'data': project_schema.dump(projects, many=True).data})
+        # projects = Projects.query.all()
+        return jsonify(get_paginated_list(
+                Projects,
+                '/projects',
+                start=request.args.get('start', 1),
+                limit=request.args.get('limit', 5)
+            ))
+        # return jsonify({'data': project_schema.dump(projects, many=True).data})
 
     def post(self):
         data = project_schema.load(request.json)[0]
@@ -34,6 +70,7 @@ class ProjectsInitializer(Resource):
 class ProjectsResources(Resource):
     def get(self, id):
         project = Projects.query.filter_by(id=id).first()
+
         return jsonify(dict(id=id, name=project.name, contract_id=project.contract_id, status=project.name))
 
     # update contract_id
@@ -97,7 +134,7 @@ class ProjectsCalc(Resource):
         log.debug("GET method")
         _project = Projects.query.filter_by(id=uuid.UUID(id)).first()
         if not _project:
-            # abort(404)
+            abort(404)
             return {"message": "There is no such project"}, 404
 
         _id = str(_project.id)
@@ -105,11 +142,18 @@ class ProjectsCalc(Resource):
         if not _data:
             abort(400)
             return {"message": "No input data provided"}, 400
+        if not bool(_data):
+            abort(400)
+            return {"message": "Empty data"}, 400
         _project.status = "calculation"
         db.session.commit()
-        output_prj = project_schema.dump(_project).data
-        output_data = data_schema.dump(_data).data
-        return jsonify({"project": output_prj, "data": output_data})
+        try:
+            output_prj = project_schema.dump(_project).data
+            output_data = data_schema.dump(_data).data
+        except:
+            abort(400)
+            return {"message": "Something is wrong"}, 400
+        return jsonify({"project": output_prj, "data": output_data}), 200
 
     def post(self, id):
         """
@@ -138,14 +182,17 @@ class ProjectsCalcResult(Resource):
         # deserialize input json
         json_data = request.get_json()
         if not json_data:
-            return {"msg": "No input data provided"}, 400
+            return {"message": "No input data provided"}, 400
 
         new_status = json_data["status"]
 
-        log.debug(new_status)
         project = Projects.query.filter_by(id=uuid.UUID(id)).first()
         if not project:
-            return {"msg": "Can't update - no such project"}, 404
-        project.status = new_status
-        db.session.commit()
-        return {"msg": "Status succefully updated for {}".format(new_status)}, 200
+            return {"message": "Can't update - no such project"}, 404
+
+        try:
+            project.status = new_status
+            db.session.commit()
+        except:
+            return {"message": "Wrong"}, 418
+        return {"message": "Status succefully updated for {}".format(new_status)}, 200

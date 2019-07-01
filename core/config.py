@@ -15,7 +15,7 @@ DBNAME = 'postgres'
 db = SQLAlchemy()
 migrate = Migrate()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def postgres_uri():
@@ -23,7 +23,7 @@ def postgres_uri():
 
 
 def create_app():
-    app = Flask(__name__, template_folder=os.path.join(BASE_DIR, 'templates'))
+    app = Flask(__name__)
     api.init_app(app)
     app.config['SQLALCHEMY_DATABASE_URI'] = postgres_uri()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
